@@ -1,0 +1,32 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT}:${OLLAMA_PORT}"
+    volumes:
+      - ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+        limits:
+          memory: "${MEMORY_LIMIT}"
+          cpus: "${CPU_LIMIT}"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${GPU_SUPPORT}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_NICE
+    read_only: true
+
+volumes:
+  ollama:
